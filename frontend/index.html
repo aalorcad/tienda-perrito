@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda de Perritos Aaron</title>
+    <style>
+        body { font-family: Arial; text-align: center; background: #eef2f3; }
+        .producto { background: white; padding: 15px; margin: 10px auto; width: 50%; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <h1>🦴 Bienvenidos a la Tienda de Aaron 🦴</h1>
+    <div id="lista">Cargando productos...</div>
+
+    <script>
+        // REEMPLAZA '3.80.XX.XX' CON LA IP PÚBLICA DE TU INSTANCIA TIENDA-BACKEND
+        fetch('http://18.206.174.185:3001/productos')
+            .then(res => res.json())
+            .then(data => {
+                const div = document.getElementById('lista');
+                div.innerHTML = '';
+                data.forEach(p => {
+                    div.innerHTML += `<div class="producto"><b>${p.nombre}</b> - $${p.precio}</div>`;
+                });
+            })
+            .catch(err => {
+                document.getElementById('lista').innerText = 'Error: No se pudo conectar con el backend.';
+                console.error(err);
+            });
+    </script>
+</body>
+</html>
