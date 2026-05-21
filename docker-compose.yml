@@ -42,4 +42,4 @@ services:
 
 # Declaración del volumen nombrado para persistencia
 volumes:
-  db_data: 
+  db_data:

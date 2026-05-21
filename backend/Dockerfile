@@ -8,7 +8,7 @@ RUN npm install
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm prunes --production
+RUN npm prune --production
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 
