@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # 1. Base de Datos
+  db:
+    build: ./db
+    container_name: tienda-perrito-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: tiendadb
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # 2. Backend (Node.js)
+  backend:
+    build: ./backend
+    container_name: tienda-perrito-backend
+    restart: always
+    environment:
+      - PORT=3000
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=admin123
+      - DB_NAME=tiendadb
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+
+  # 3. Frontend (Nginx)
+  frontend:
+    build: ./frontend
+    container_name: tienda-perrito-frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+# Declaración del volumen nombrado para persistencia
+volumes:
+  db_data: 
