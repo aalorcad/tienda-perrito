@@ -5,10 +5,10 @@ const app = express();
 app.use(cors());
 
 const db = mysql.createConnection({
-    host: '172.31.26.223', // <-- REEMPLAZA CON LA IP PRIVADA DE TU INSTANCIA TIENDA-DB
+    host: '172.31.26.218', // <-- Confirma que esta siga siendo tu IP privada actual de la EC2
     user: 'root',
-    password: 'admin123',
-    database: 'tienda_perritos'
+    password: 'root', // <-- Corregido para que conecte a tu Docker
+    database: 'tienda_perrito' // <-- Corregido (en singular)
 });
 
 app.get('/productos', (req, res) => {
