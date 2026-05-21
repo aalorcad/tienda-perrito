@@ -30,7 +30,7 @@ jobs:
     - name: Construir y Publicar Imagen del Backend
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: tienda-perrito-back
+        ECR_REPOSITORY: tienda-backend
         IMAGE_TAG: latest
       run: |
         cd backend
@@ -41,14 +41,14 @@ jobs:
       env:
         INSTANCE_ID: ${{ secrets.EC2_BACKEND_INSTANCE_ID }}
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: tienda-perrito-back
+        REPOSITORY: tienda-backend
       run: |
         COMMANDS=$(cat << 'EOF'
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY
         docker pull $REGISTRY/$REPOSITORY:latest
-        docker stop tienda-perrito-backend || true
-        docker rm tienda-perrito-backend || true
-        docker run -d --name tienda-perrito-backend -p 3000:3000 $REGISTRY/$REPOSITORY:latest
+        docker stop tienda-backend || true
+        docker rm tienda-backend || true
+        docker run -d --name tienda-backend -p 3000:3000 $REGISTRY/$REPOSITORY:latest
         EOF
         )
         

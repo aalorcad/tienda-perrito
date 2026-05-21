@@ -30,7 +30,7 @@ jobs:
     - name: Construir y Publicar Imagen del Frontend
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: tienda-perrito-front
+        ECR_REPOSITORY: tienda-fronted
         IMAGE_TAG: latest
       run: |
         cd frontend
@@ -41,14 +41,14 @@ jobs:
       env:
         INSTANCE_ID: ${{ secrets.EC2_FRONTEND_INSTANCE_ID }}
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: tienda-perrito-front
+        REPOSITORY: tienda-frontend
       run: |
         COMMANDS=$(cat << 'EOF'
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY
         docker pull $REGISTRY/$REPOSITORY:latest
-        docker stop tienda-perrito-frontend || true
-        docker rm tienda-perrito-frontend || true
-        docker run -d --name tienda-perrito-frontend -p 80:80 $REGISTRY/$REPOSITORY:latest
+        docker stop tienda-frontend || true
+        docker rm tienda-frontend || true
+        docker run -d --name tienda-frontend -p 80:80 $REGISTRY/$REPOSITORY:latest
         EOF
         )
         
