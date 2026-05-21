@@ -30,7 +30,7 @@ jobs:
     - name: Construir y Publicar Imagen del Frontend
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: tienda-fronted
+        ECR_REPOSITORY: tienda-frontend
         IMAGE_TAG: latest
       run: |
         cd frontend
