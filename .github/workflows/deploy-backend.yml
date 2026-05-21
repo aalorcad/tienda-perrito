@@ -1,7 +1,5 @@
 name: Deploy Backend
 
-# El pipeline solo se activa si subes cambios a la rama deploy
-# Y exclusivamente si modificas algo dentro de la carpeta 'backend'
 on:
   push:
     branches:
@@ -14,47 +12,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Descargar el código en el entorno de GitHub
     - name: Checkout del código
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
-    # 2. Autenticarse en AWS usando tus Secrets
     - name: Configurar credenciales de AWS
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1 # 👈 Cambia tu región si es distinta
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: us-east-1
 
-    # 3. Autenticarse en Amazon ECR
     - name: Login en Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
-    # 4. Construir la imagen Multi-stage y subirla a ECR
     - name: Construir y Publicar Imagen del Backend
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: tienda-backend # 👈 REEMPLAZA CON EL NOMBRE DE TU REPOSITORIO ECR DEL BACKEND
+        ECR_REPOSITORY: tienda-perrito-back
         IMAGE_TAG: latest
       run: |
         cd backend
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-    # 5. Desplegar en la EC2 usando AWS SSM (Mínimo Privilegio, sin llaves SSH)
     - name: Desplegar Backend en EC2 vía SSM
       env:
         INSTANCE_ID: ${{ secrets.EC2_BACKEND_INSTANCE_ID }}
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: tienda-backend # 👈 El mismo nombre de tu ECR del backend
+        REPOSITORY: tienda-perrito-back
       run: |
-        COMMANDS=$(cat << EOF
+        COMMANDS=$(cat << 'EOF'
         aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY
         docker pull $REGISTRY/$REPOSITORY:latest
-        docker stop tienda-backend || true
-        docker rm tienda-backend || true
-        docker run -d --name tienda-backendd -p 3000:3000 $REGISTRY/$REPOSITORY:latest
+        docker stop tienda-perrito-backend || true
+        docker rm tienda-perrito-backend || true
+        docker run -d --name tienda-perrito-backend -p 3000:3000 $REGISTRY/$REPOSITORY:latest
         EOF
         )
         
@@ -62,4 +56,4 @@ jobs:
           --instance-ids "$INSTANCE_ID" \
           --document-name "AWS-RunShellScript" \
           --parameters "commands=[$COMMANDS]" \
-          --comment "Despliegue automático Backend desde GitHub Actions"
+          --comment "Despliegue automatico Backend"
